@@ -52,7 +52,7 @@ function App() {
         <div className="p-6 bg-blue-600 text-white flex items-center justify-between shadow-md">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <Globe className="w-5 h-5" />
-            Filipimo
+            Filipino Translator
           </h1>
           <button
             onClick={() => setTargetLang(prev => prev === 'ko-KR' ? 'en-US' : 'ko-KR')}
