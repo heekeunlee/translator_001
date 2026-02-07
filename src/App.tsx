@@ -64,10 +64,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-orange-100">
+    <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4 font-sans">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-blue-100">
         {/* Header */}
-        <div className="p-6 bg-gradient-to-r from-orange-500 to-pink-500 text-white flex items-center justify-between shadow-lg">
+        <div className="p-6 bg-gradient-to-r from-blue-500 to-cyan-500 text-white flex items-center justify-between shadow-lg">
           <h1 className="text-xl font-bold flex items-center gap-2 drop-shadow-md">
             <span className="text-2xl">🍧</span>
             HaloHalo Talk
@@ -93,7 +93,7 @@ function App() {
                       setForeignLang(lang.code);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-orange-50 transition-colors ${foreignLang === lang.code ? 'bg-orange-50 font-bold text-orange-600' : 'text-gray-700'}`}
+                    className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-blue-50 transition-colors ${foreignLang === lang.code ? 'bg-blue-50 font-bold text-blue-600' : 'text-gray-700'}`}
                   >
                     <span className="text-lg">{lang.flag}</span>
                     {lang.label}
@@ -110,13 +110,13 @@ function App() {
             <div className="bg-gray-100 p-1 rounded-full flex relative w-full max-w-[280px]">
               <button
                 onClick={() => setDirection('KR_TO_FOREIGN')}
-                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'KR_TO_FOREIGN' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'KR_TO_FOREIGN' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 KR → {currentForeignLang.label}
               </button>
               <button
                 onClick={() => setDirection('FOREIGN_TO_KR')}
-                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'FOREIGN_TO_KR' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'FOREIGN_TO_KR' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 {currentForeignLang.label} → KR
               </button>
@@ -124,10 +124,10 @@ function App() {
           </div>
 
           {/* Input Area */}
-          <div className="bg-gray-50 rounded-2xl p-5 min-h-[140px] border-2 border-dashed border-gray-200 relative group transition-all hover:border-orange-200 hover:bg-white">
+          <div className="bg-gray-50 rounded-2xl p-5 min-h-[140px] border-2 border-dashed border-gray-200 relative group transition-all hover:border-blue-200 hover:bg-white">
             <p className="text-gray-400 text-xs mb-2 font-bold tracking-wider uppercase flex justify-between">
               <span>{direction === 'FOREIGN_TO_KR' ? currentForeignLang.label : 'Korean'}</span>
-              {isListening && <span className="text-red-500 animate-pulse">● Rec</span>}
+              {isListening && <span className="text-blue-500 animate-pulse">● Rec</span>}
             </p>
             <p className="text-gray-600 text-base leading-relaxed font-normal break-words">
               {transcript || <span className="text-gray-400 italic">Tap microphone to speak...</span>}
@@ -135,15 +135,15 @@ function App() {
           </div>
 
           {/* Translation Area */}
-          <div className="bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl p-5 min-h-[140px] border border-orange-100 relative group transition-all hover:shadow-md">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-5 min-h-[140px] border border-blue-100 relative group transition-all hover:shadow-md">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-orange-500 text-xs font-bold tracking-wider uppercase">
+              <p className="text-blue-500 text-xs font-bold tracking-wider uppercase">
                 {direction === 'FOREIGN_TO_KR' ? 'Korean' : currentForeignLang.label}
               </p>
               {translatedText && (
                 <button
                   onClick={speakTranslation}
-                  className="p-2 -mr-2 -mt-2 text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
+                  className="p-2 -mr-2 -mt-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
                   title="Listen"
                 >
                   <Volume2 className="w-5 h-5" />
@@ -153,9 +153,9 @@ function App() {
             <p className="text-gray-900 text-3xl leading-snug font-bold break-words">
               {isTranslating ? (
                 <span className="animate-pulse opacity-50 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                  <span className="w-3 h-3 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                  <span className="w-3 h-3 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  <span className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                 </span>
               ) : (
                 translatedText || <span className="opacity-30">...</span>
@@ -168,14 +168,14 @@ function App() {
             <button
               onClick={handleToggleListening}
               className={`relative p-8 rounded-full shadow-xl transition-all transform hover:scale-105 active:scale-95 ${isListening
-                ? 'bg-red-500 text-white shadow-red-200 ring-4 ring-red-100'
-                : 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-orange-200 hover:shadow-orange-300'
+                ? 'bg-blue-500 text-white shadow-blue-200 ring-4 ring-blue-100'
+                : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-200 hover:shadow-blue-300'
                 }`}
             >
               {isListening ? (
                 <>
                   <StopCircle className="w-10 h-10 animate-pulse" />
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-red-500 text-sm font-bold whitespace-nowrap">
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-blue-100 text-sm font-bold whitespace-nowrap">
                     Stop
                   </span>
                 </>
