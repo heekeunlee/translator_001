@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Mic, StopCircle, Volume2, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Mic, StopCircle, Volume2, ChevronDown, Camera, X } from 'lucide-react';
+import { createWorker } from 'tesseract.js';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { translateText } from './services/translate';
 
@@ -29,14 +30,24 @@ function App() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // OCR State
+  const [ocrText, setOcrText] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const currentForeignLang = LANGUAGES.find(l => l.code === foreignLang)!;
+
+  // Combined input text (Speech takes precedence only if actively listening/transcribing, otherwise show OCR if available)
+  const displayText = isListening ? transcript : (ocrText || transcript);
 
   // Debounce translation
   useEffect(() => {
+    const textToTranslate = displayText;
+
     const timer = setTimeout(async () => {
-      if (transcript.trim()) {
+      if (textToTranslate.trim()) {
         setIsTranslating(true);
-        const result = await translateText(transcript, sourceLang, targetLang);
+        const result = await translateText(textToTranslate, sourceLang, targetLang);
         setTranslatedText(result.translatedText || '');
         setIsTranslating(false);
       } else {
@@ -45,14 +56,52 @@ function App() {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [transcript, sourceLang, targetLang]);
+  }, [displayText, sourceLang, targetLang]);
 
   const handleToggleListening = () => {
     if (isListening) {
       stopListening();
     } else {
+      setOcrText(''); // Clear OCR text when starting speech
       startListening();
       setTranslatedText('');
+    }
+  };
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (isListening) stopListening();
+    setIsScanning(true);
+    setOcrText('');
+    setTranslatedText('');
+
+    try {
+      // Basic mapping for Tesseract
+      // Note: Tesseract language codes: 'eng', 'kor', 'ceb', 'tgl' (Tagalog)
+      let tessLang = 'eng';
+      if (sourceLang === 'ko-KR') tessLang = 'kor';
+      else if (sourceLang === 'tl-PH') tessLang = 'tgl';
+      else if (sourceLang === 'ceb-PH') tessLang = 'ceb';
+
+      const worker = await createWorker(tessLang);
+
+      const { data: { text } } = await worker.recognize(file);
+      await worker.terminate();
+
+      setOcrText(text.replace(/\s+/g, ' ').trim());
+    } catch (error) {
+      console.error("OCR Error:", error);
+      alert("Failed to scan text. Please try again.");
+    } finally {
+      setIsScanning(false);
+      // Reset input so same file can be selected again if needed
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -127,10 +176,13 @@ function App() {
           <div className="bg-gray-50 rounded-2xl p-5 min-h-[140px] border-2 border-dashed border-gray-200 relative group transition-all hover:border-blue-200 hover:bg-white">
             <p className="text-gray-400 text-xs mb-2 font-bold tracking-wider uppercase flex justify-between">
               <span>{direction === 'FOREIGN_TO_KR' ? currentForeignLang.label : 'Korean'}</span>
-              {isListening && <span className="text-blue-500 animate-pulse">● Rec</span>}
+              <span className="flex gap-2">
+                {isScanning && <span className="text-blue-500 animate-pulse">Scanning...</span>}
+                {isListening && <span className="text-blue-500 animate-pulse">● Rec</span>}
+              </span>
             </p>
             <p className="text-gray-600 text-base leading-relaxed font-normal break-words">
-              {transcript || <span className="text-gray-400 italic">Tap microphone to speak...</span>}
+              {displayText || <span className="text-gray-400 italic">Tap microphone to speak or camera to scan...</span>}
             </p>
           </div>
 
@@ -164,12 +216,30 @@ function App() {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-col items-center gap-4 pt-2">
+          <div className="flex justify-center items-center gap-8 pt-4 pb-8">
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+            />
+
+            <button
+              onClick={handleCameraClick}
+              disabled={isListening || isScanning}
+              className="p-4 rounded-full bg-white text-blue-500 shadow-lg border border-blue-100 hover:bg-blue-50 active:scale-95 transition-all disabled:opacity-50"
+              title="Snap & Translate"
+            >
+              <Camera className="w-6 h-6" />
+            </button>
+
             <button
               onClick={handleToggleListening}
               className={`relative p-8 rounded-full shadow-xl transition-all transform hover:scale-105 active:scale-95 ${isListening
-                ? 'bg-blue-500 text-white shadow-blue-200 ring-4 ring-blue-100'
-                : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-200 hover:shadow-blue-300'
+                  ? 'bg-blue-500 text-white shadow-blue-200 ring-4 ring-blue-100'
+                  : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-200 hover:shadow-blue-300'
                 }`}
             >
               {isListening ? (
@@ -187,6 +257,14 @@ function App() {
                   </span>
                 </>
               )}
+            </button>
+
+            <button
+              onClick={() => { setOcrText(''); setTranslatedText(''); }}
+              className="p-4 rounded-full bg-white text-gray-400 shadow-lg border border-gray-100 hover:bg-gray-50 active:scale-95 transition-all"
+              title="Clear"
+            >
+              <X className="w-6 h-6" />
             </button>
           </div>
         </div>
