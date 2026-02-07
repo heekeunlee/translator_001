@@ -1,18 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Mic, Globe, StopCircle, Volume2, ArrowRightLeft } from 'lucide-react';
+import { Mic, StopCircle, Volume2, ChevronDown } from 'lucide-react';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { translateText } from './services/translate';
 
+type LanguageCode = 'en-US' | 'tl-PH' | 'ceb-PH';
+
+interface LanguageOption {
+  code: LanguageCode;
+  label: string;
+  flag: string;
+}
+
+const LANGUAGES: LanguageOption[] = [
+  { code: 'en-US', label: 'English', flag: '🇺🇸' },
+  { code: 'tl-PH', label: 'Tagalog', flag: '🇵🇭' },
+  { code: 'ceb-PH', label: 'Cebuano', flag: '🏝️' },
+];
+
 function App() {
-  const [targetLang, setTargetLang] = useState<'ko-KR' | 'en-US'>('ko-KR');
-  // targetLang is the language we want to translate TO.
-  // If targetLang is 'ko-KR', source is 'en-US'.
-  // If targetLang is 'en-US', source is 'ko-KR'.
-  const sourceLang = targetLang === 'ko-KR' ? 'en-US' : 'ko-KR';
+  const [foreignLang, setForeignLang] = useState<LanguageCode>('en-US');
+  const [direction, setDirection] = useState<'FOREIGN_TO_KR' | 'KR_TO_FOREIGN'>('FOREIGN_TO_KR');
+
+  const sourceLang = direction === 'FOREIGN_TO_KR' ? foreignLang : 'ko-KR';
+  const targetLang = direction === 'FOREIGN_TO_KR' ? 'ko-KR' : foreignLang;
 
   const { isListening, transcript, startListening, stopListening } = useSpeechRecognition(sourceLang);
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const currentForeignLang = LANGUAGES.find(l => l.code === foreignLang)!;
 
   // Debounce translation
   useEffect(() => {
@@ -25,7 +42,7 @@ function App() {
       } else {
         setTranslatedText('');
       }
-    }, 800); // 800ms debounce
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [transcript, sourceLang, targetLang]);
@@ -35,7 +52,7 @@ function App() {
       stopListening();
     } else {
       startListening();
-      setTranslatedText(''); // Clear previous translation when starting new
+      setTranslatedText('');
     }
   };
 
@@ -47,53 +64,99 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="p-6 bg-blue-600 text-white flex items-center justify-between shadow-md">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <Globe className="w-5 h-5" />
-            Filipino Translator
+    <div className="min-h-screen bg-orange-50 flex items-center justify-center p-4 font-sans">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-orange-100">
+        {/* Header */}
+        <div className="p-6 bg-gradient-to-r from-orange-500 to-pink-500 text-white flex items-center justify-between shadow-lg">
+          <h1 className="text-xl font-bold flex items-center gap-2 drop-shadow-md">
+            <span className="text-2xl">🍧</span>
+            HaloHalo Talk
           </h1>
-          <button
-            onClick={() => setTargetLang(prev => prev === 'ko-KR' ? 'en-US' : 'ko-KR')}
-            className="flex items-center gap-2 text-sm bg-blue-700/50 hover:bg-blue-700 px-4 py-2 rounded-full transition-all border border-blue-400/30 backdrop-blur-sm"
-          >
-            <span className={sourceLang === 'en-US' ? 'font-bold' : 'opacity-70'}>EN</span>
-            <ArrowRightLeft className="w-4 h-4" />
-            <span className={sourceLang === 'ko-KR' ? 'font-bold' : 'opacity-70'}>KR</span>
-          </button>
+
+          {/* Language Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full hover:bg-white/30 transition-all text-sm font-medium border border-white/30"
+            >
+              <span>{currentForeignLang.flag}</span>
+              <span>{currentForeignLang.label}</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl overflow-hidden z-10 border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setForeignLang(lang.code);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-orange-50 transition-colors ${foreignLang === lang.code ? 'bg-orange-50 font-bold text-orange-600' : 'text-gray-700'}`}
+                  >
+                    <span className="text-lg">{lang.flag}</span>
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Direction Toggle */}
+          <div className="flex justify-center">
+            <div className="bg-gray-100 p-1 rounded-full flex relative w-full max-w-[280px]">
+              <button
+                onClick={() => setDirection('FOREIGN_TO_KR')}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'FOREIGN_TO_KR' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                {currentForeignLang.label} → KR
+              </button>
+              <button
+                onClick={() => setDirection('KR_TO_FOREIGN')}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'KR_TO_FOREIGN' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                KR → {currentForeignLang.label}
+              </button>
+            </div>
+          </div>
+
           {/* Input Area */}
-          <div className="bg-gray-50 rounded-2xl p-5 min-h-[140px] border border-gray-200 relative group transition-all hover:border-blue-200">
-            <p className="text-gray-400 text-xs mb-2 font-bold tracking-wider uppercase">
-              {sourceLang === 'en-US' ? 'Speaking (English)' : 'Speaking (Korean)'}
+          <div className="bg-gray-50 rounded-2xl p-5 min-h-[140px] border-2 border-dashed border-gray-200 relative group transition-all hover:border-orange-200 hover:bg-white">
+            <p className="text-gray-400 text-xs mb-2 font-bold tracking-wider uppercase flex justify-between">
+              <span>{direction === 'FOREIGN_TO_KR' ? currentForeignLang.label : 'Korean'}</span>
+              {isListening && <span className="text-red-500 animate-pulse">● Rec</span>}
             </p>
-            <p className="text-gray-800 text-xl leading-relaxed font-medium">
+            <p className="text-gray-800 text-xl leading-relaxed font-medium break-words">
               {transcript || <span className="text-gray-400 italic font-normal">Tap microphone to speak...</span>}
             </p>
           </div>
 
           {/* Translation Area */}
-          <div className="bg-blue-50/80 rounded-2xl p-5 min-h-[140px] border border-blue-100 relative group transition-all hover:border-blue-300">
+          <div className="bg-gradient-to-br from-orange-50 to-pink-50 rounded-2xl p-5 min-h-[140px] border border-orange-100 relative group transition-all hover:shadow-md">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-blue-500 text-xs font-bold tracking-wider uppercase">
-                {targetLang === 'ko-KR' ? 'Translation (Korean)' : 'Translation (English)'}
+              <p className="text-orange-500 text-xs font-bold tracking-wider uppercase">
+                {direction === 'FOREIGN_TO_KR' ? 'Korean' : currentForeignLang.label}
               </p>
               {translatedText && (
                 <button
                   onClick={speakTranslation}
-                  className="p-2 -mr-2 -mt-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                  className="p-2 -mr-2 -mt-2 text-orange-600 hover:bg-orange-100 rounded-full transition-colors"
                   title="Listen"
                 >
                   <Volume2 className="w-5 h-5" />
                 </button>
               )}
             </div>
-            <p className="text-blue-900 text-xl leading-relaxed font-semibold">
+            <p className="text-gray-900 text-xl leading-relaxed font-semibold break-words">
               {isTranslating ? (
-                <span className="animate-pulse opacity-50">Translating...</span>
+                <span className="animate-pulse opacity-50 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                </span>
               ) : (
                 translatedText || <span className="opacity-30">...</span>
               )}
@@ -106,7 +169,7 @@ function App() {
               onClick={handleToggleListening}
               className={`relative p-8 rounded-full shadow-xl transition-all transform hover:scale-105 active:scale-95 ${isListening
                 ? 'bg-red-500 text-white shadow-red-200 ring-4 ring-red-100'
-                : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700'
+                : 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-orange-200 hover:shadow-orange-300'
                 }`}
             >
               {isListening ? (

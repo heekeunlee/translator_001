@@ -11,9 +11,16 @@ export const translateText = async (
     if (!text.trim()) return { translatedText: '' };
 
     try {
-        // Basic language code mapping (MyMemory uses 2-letter codes mostly)
-        const src = sourceLang.split('-')[0];
-        const tgt = targetLang.split('-')[0];
+        // Basic language code mapping
+        // MyMemory uses 'tl' for Tagalog and 'ceb' for Cebuano
+        let src = sourceLang.split('-')[0];
+        let tgt = targetLang.split('-')[0];
+
+        // Corrections for MyMemory if needed
+        if (sourceLang === 'tl-PH') src = 'tl';
+        if (targetLang === 'tl-PH') tgt = 'tl';
+        if (sourceLang === 'ceb-PH') src = 'ceb';
+        if (targetLang === 'ceb-PH') tgt = 'ceb';
 
         const response = await fetch(
             `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`
