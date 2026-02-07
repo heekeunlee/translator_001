@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, Globe, StopCircle, Volume2, ArrowRightLeft } from 'lucide-react';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { translateText } from './services/translate';
@@ -105,8 +105,8 @@ function App() {
             <button
               onClick={handleToggleListening}
               className={`relative p-8 rounded-full shadow-xl transition-all transform hover:scale-105 active:scale-95 ${isListening
-                  ? 'bg-red-500 text-white shadow-red-200 ring-4 ring-red-100'
-                  : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700'
+                ? 'bg-red-500 text-white shadow-red-200 ring-4 ring-red-100'
+                : 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700'
                 }`}
             >
               {isListening ? (
