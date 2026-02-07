@@ -19,7 +19,7 @@ const LANGUAGES: LanguageOption[] = [
 
 function App() {
   const [foreignLang, setForeignLang] = useState<LanguageCode>('en-US');
-  const [direction, setDirection] = useState<'FOREIGN_TO_KR' | 'KR_TO_FOREIGN'>('FOREIGN_TO_KR');
+  const [direction, setDirection] = useState<'FOREIGN_TO_KR' | 'KR_TO_FOREIGN'>('KR_TO_FOREIGN');
 
   const sourceLang = direction === 'FOREIGN_TO_KR' ? foreignLang : 'ko-KR';
   const targetLang = direction === 'FOREIGN_TO_KR' ? 'ko-KR' : foreignLang;
@@ -109,16 +109,16 @@ function App() {
           <div className="flex justify-center">
             <div className="bg-gray-100 p-1 rounded-full flex relative w-full max-w-[280px]">
               <button
-                onClick={() => setDirection('FOREIGN_TO_KR')}
-                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'FOREIGN_TO_KR' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                {currentForeignLang.label} → KR
-              </button>
-              <button
                 onClick={() => setDirection('KR_TO_FOREIGN')}
                 className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'KR_TO_FOREIGN' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 KR → {currentForeignLang.label}
+              </button>
+              <button
+                onClick={() => setDirection('FOREIGN_TO_KR')}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-bold transition-all duration-300 z-10 ${direction === 'FOREIGN_TO_KR' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                {currentForeignLang.label} → KR
               </button>
             </div>
           </div>
@@ -129,8 +129,8 @@ function App() {
               <span>{direction === 'FOREIGN_TO_KR' ? currentForeignLang.label : 'Korean'}</span>
               {isListening && <span className="text-red-500 animate-pulse">● Rec</span>}
             </p>
-            <p className="text-gray-800 text-xl leading-relaxed font-medium break-words">
-              {transcript || <span className="text-gray-400 italic font-normal">Tap microphone to speak...</span>}
+            <p className="text-gray-600 text-base leading-relaxed font-normal break-words">
+              {transcript || <span className="text-gray-400 italic">Tap microphone to speak...</span>}
             </p>
           </div>
 
@@ -150,12 +150,12 @@ function App() {
                 </button>
               )}
             </div>
-            <p className="text-gray-900 text-xl leading-relaxed font-semibold break-words">
+            <p className="text-gray-900 text-3xl leading-snug font-bold break-words">
               {isTranslating ? (
                 <span className="animate-pulse opacity-50 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  <span className="w-3 h-3 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-3 h-3 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-3 h-3 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
                 </span>
               ) : (
                 translatedText || <span className="opacity-30">...</span>
