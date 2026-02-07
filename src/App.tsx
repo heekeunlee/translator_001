@@ -3,6 +3,7 @@ import { Mic, StopCircle, Volume2, ChevronDown, Camera, X } from 'lucide-react';
 import { createWorker } from 'tesseract.js';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { translateText } from './services/translate';
+import Phrasebook from './components/Phrasebook';
 
 type LanguageCode = 'en-US' | 'tl-PH' | 'ceb-PH';
 
@@ -238,8 +239,8 @@ function App() {
             <button
               onClick={handleToggleListening}
               className={`relative p-8 rounded-full shadow-xl transition-all transform hover:scale-105 active:scale-95 ${isListening
-                  ? 'bg-blue-500 text-white shadow-blue-200 ring-4 ring-blue-100'
-                  : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-200 hover:shadow-blue-300'
+                ? 'bg-blue-500 text-white shadow-blue-200 ring-4 ring-blue-100'
+                : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-blue-200 hover:shadow-blue-300'
                 }`}
             >
               {isListening ? (
@@ -268,6 +269,9 @@ function App() {
             </button>
           </div>
         </div>
+
+        {/* Phrasebook Section */}
+        <Phrasebook />
       </div>
     </div>
   );
